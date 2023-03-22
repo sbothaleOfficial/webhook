@@ -5,6 +5,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.webhook.model.User;
 import com.webhook.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.OutputStream;
@@ -14,6 +16,7 @@ import java.util.Map;
 public class GetHandler implements HttpHandler {
     private final UserRepository userRepository;
     private final Gson gson;
+    private static final Logger logger = LogManager.getLogger(GetHandler.class);
 
     public GetHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -25,6 +28,7 @@ public class GetHandler implements HttpHandler {
         String response;
         int responseCode;
         Map<String, String> queryParams = QueryParser.parse(exchange.getRequestURI().getQuery());
+        logger.debug("Handling GET request with query parameters: {}", queryParams);
         if (queryParams.isEmpty()) {
             List<User> users = userRepository.getUsers();
             responseCode = 200;
@@ -63,6 +67,7 @@ public class GetHandler implements HttpHandler {
             responseCode = 400;
             response = "Invalid query parameter";
         }
+        logger.debug("Sending GET response with code {} and body: {}", responseCode, response);
         exchange.sendResponseHeaders(responseCode, response.getBytes().length);
         OutputStream responseBody = exchange.getResponseBody();
         responseBody.write(response.getBytes());

@@ -5,6 +5,8 @@ import com.sun.net.httpserver.HttpExchange;
 import com.sun.net.httpserver.HttpHandler;
 import com.webhook.model.User;
 import com.webhook.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -13,6 +15,7 @@ import java.io.OutputStream;
 public class PostHandler implements HttpHandler {
     private final UserRepository userRepository;
     private final Gson gson;
+    private static final Logger logger = LogManager.getLogger(PostHandler.class);
 
     public PostHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -25,6 +28,7 @@ public class PostHandler implements HttpHandler {
         int responseCode;
         InputStream requestBody = exchange.getRequestBody();
         User user = gson.fromJson(new String(requestBody.readAllBytes()), User.class);
+        logger.debug("Handling POST request with body: {}", gson.toJson(user));
         if (user.getId() == 0 || user.getName() == null || user.getLocation() == null) {
             responseCode = 400;
             response = "Invalid user object";
@@ -33,6 +37,7 @@ public class PostHandler implements HttpHandler {
             responseCode = 200;
             response = "User added successfully";
         }
+        logger.debug("Sending POST response with code {} and body: {}", responseCode, response);
         exchange.sendResponseHeaders(responseCode, response.getBytes().length);
         OutputStream responseBody = exchange.getResponseBody();
         responseBody.write(response.getBytes());

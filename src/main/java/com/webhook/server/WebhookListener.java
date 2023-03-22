@@ -3,18 +3,18 @@ package com.webhook.server;
 import com.sun.net.httpserver.HttpServer;
 import com.webhook.handler.GetHandler;
 import com.webhook.handler.PostHandler;
+import com.webhook.repository.UserRepository;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 import java.io.IOException;
 import java.net.InetSocketAddress;
 
-import com.webhook.repository.UserRepository;
-
 public class WebhookListener {
-
     private static final int PORT = 8000;
-
     private HttpServer server;
     private UserRepository userRepository;
+    private static final Logger logger = LogManager.getLogger(WebhookListener.class);
 
     public WebhookListener(UserRepository userRepository) {
         this.userRepository = userRepository;
@@ -26,13 +26,13 @@ public class WebhookListener {
         server.createContext("/post", new PostHandler(userRepository));
         server.setExecutor(null);
         server.start();
-        System.out.println("Webhook server started on port " + PORT);
+        logger.info("Webhook server started on port {}", PORT);
     }
 
     public void stop() {
         if (server != null) {
             server.stop(0);
-            System.out.println("Webhook server stopped");
+            logger.info("Webhook server stopped");
         }
     }
 }
