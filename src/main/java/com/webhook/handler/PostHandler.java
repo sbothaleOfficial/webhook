@@ -12,16 +12,31 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 
+/**
+ * Handler for POST requests to add a new user to the repository.
+ */
 public class PostHandler implements HttpHandler {
     private final UserRepository userRepository;
     private final Gson gson;
     private static final Logger logger = LogManager.getLogger(PostHandler.class);
 
+    /**
+     * Creates a new PostHandler with the specified UserRepository.
+     *
+     * @param userRepository the UserRepository to use
+     */
     public PostHandler(UserRepository userRepository) {
         this.userRepository = userRepository;
         this.gson = new Gson();
     }
 
+    /**
+     * Handles a POST request by adding the user specified in the request body to the UserRepository.
+     * Responds with a status code and message indicating success or failure.
+     *
+     * @param exchange the HttpExchange object representing the current HTTP request
+     * @throws IOException if an I/O error occurs
+     */
     @Override
     public void handle(HttpExchange exchange) throws IOException {
         String response;
